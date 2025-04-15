@@ -418,7 +418,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 95
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8600000, guid: 9720ce296a0cc8648b29cf52cdc8ee4d, type: 2}
+  m_TargetTexture: {fileID: 8400000, guid: 9ca58031332e90f48b91a20790bb154c, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -548,6 +548,7 @@ MonoBehaviour:
   _speedFactor: 1
   _jumpFactor: 1
   _speedScale: 0
+  _playerHPlimit: 0
   _PlayerMovement: {fileID: 0}
   _playerMovementState: 0
 --- !u!4 &1182875264
@@ -771,7 +772,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 8600000, guid: 9720ce296a0cc8648b29cf52cdc8ee4d, type: 2}
+  m_Texture: {fileID: 8400000, guid: 9ca58031332e90f48b91a20790bb154c, type: 2}
   m_UVRect:
     serializedVersion: 2
     x: 0
