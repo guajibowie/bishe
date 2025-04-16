@@ -4,9 +4,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro.EditorUtilities;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.AI;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class MapGeneration : MonoBehaviour
 {
@@ -34,15 +37,22 @@ public class MapGeneration : MonoBehaviour
     public List<MapWalker> _walkers_L;
 
     public Vector2 _spawnPoint;
+
+    public NavMeshSurface _NavMeshSurface;
+
     // Start is called before the first frame update
     void Awake()
     {
+
+        _NavMeshSurface = GetComponent<NavMeshSurface>();
         _elementNumber = _matrixCols * _matrixRows;
         SeedInit();
-        WalkerMatrixInit(); 
+        WalkerMatrixInit();
         //MatrixInit();
         var player = Instantiate(_playerPrefab, new Vector3(_spawnPoint.x, 4, _spawnPoint.y), Quaternion.identity);
         PlayerManager.Instance.SetPlayerMovement(player.GetComponent<PlayerMovement>());
+
+        
     }
     public void SeedInit()
     {
@@ -242,6 +252,8 @@ public class MapGeneration : MonoBehaviour
                 yield return null;
             }
         }
+
+        CreateNavMesh();
     }
 
     IEnumerator CreateDecorations(GameObject parent)
@@ -277,5 +289,11 @@ public class MapGeneration : MonoBehaviour
         int index = UnityEngine.Random.Range(0,_decorations.Length);
         return _decorations[index];
 
+    }
+
+    public void CreateNavMesh()
+    {
+        _NavMeshSurface.RemoveData();
+        _NavMeshSurface.BuildNavMesh();
     }
 }
