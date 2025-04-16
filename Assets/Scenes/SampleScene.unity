@@ -217,7 +217,8 @@ MonoBehaviour:
   - {fileID: 6941765000743290380, guid: c60edd51c065ceb46b345849a03bc106, type: 3}
   - {fileID: 2807449429036958551, guid: f0c16f0ea935ea64297ca1d4d55d9746, type: 3}
   - {fileID: 9069115365609291303, guid: 60f79905accf3b24fa0114b941f1aac0, type: 3}
-  _maxDecoration: 6
+  _floorCloneName: []
+  _maxDecoration: 100
   _floorRadius: 14
   _matrixRows: 10
   _matrixCols: 10
@@ -228,6 +229,8 @@ MonoBehaviour:
   _elementNumber: 0
   _threshold: 0.5
   _spawnPoint: {x: 0, y: 0}
+  _NavMeshSurface: {fileID: 0}
+  _monsterSpawnPoint: []
 --- !u!4 &516983758
 Transform:
   m_ObjectHideFlags: 0

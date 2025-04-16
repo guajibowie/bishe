@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro.EditorUtilities;
 using Unity.AI.Navigation;
 using Unity.VisualScripting;
@@ -18,6 +19,8 @@ public class MapGeneration : MonoBehaviour
     public Transform _environment;
     public GameObject _playerPrefab;
     public GameObject[] _decorations;
+
+    public List<string> _floorCloneName;
 
 
     public int _maxDecoration;
@@ -39,6 +42,7 @@ public class MapGeneration : MonoBehaviour
     public Vector2 _spawnPoint;
 
     public NavMeshSurface _NavMeshSurface;
+    public List<Vector3> _monsterSpawnPoint;
 
     // Start is called before the first frame update
     void Awake()
@@ -46,6 +50,8 @@ public class MapGeneration : MonoBehaviour
 
         _NavMeshSurface = GetComponent<NavMeshSurface>();
         _elementNumber = _matrixCols * _matrixRows;
+        _floorCloneName = new List<string>();
+
         SeedInit();
         WalkerMatrixInit();
         //MatrixInit();
@@ -206,6 +212,10 @@ public class MapGeneration : MonoBehaviour
                 if(map[(int)curWalker._position.x, (int)curWalker._position.y] != 1)
                 {
                     GameObject floor = SetFloor(curWalker._position,true);
+                    if (!_floorCloneName.Contains(floor.name))
+                    {
+                        _floorCloneName.Add(floor.name);
+                    }
                     StartCoroutine(CreateDecorations(floor));
                     _counts++;
                     map[(int)curWalker._position.x, (int)curWalker._position.y] = 1;
@@ -272,7 +282,18 @@ public class MapGeneration : MonoBehaviour
             RaycastHit hit;
             if(Physics.Raycast(decoration.transform.position,-decoration.transform.up, out hit,Mathf.Infinity))
             {
+                if (!_floorCloneName.Contains(hit.transform.name))
+                {
+                    Destroy(decoration);
+                    continue;
+                }
                 decoration.transform.position = hit.point;
+                decoration.transform.rotation = Quaternion.Euler(new Vector3(decoration.transform.rotation.x, decoration.transform.rotation.y+ UnityEngine.Random.Range(0,90), decoration.transform.rotation.x));
+                decoration.transform.localScale = new Vector3(
+                    decoration.transform.localScale.x / decoration.transform.parent.localScale.x,
+                    decoration.transform.localScale.y / decoration.transform.parent.localScale.y,
+                    decoration.transform.localScale.z / decoration.transform.parent.localScale.z
+                )* UnityEngine.Random.Range(1,2);
             }
 
             yield return null;
