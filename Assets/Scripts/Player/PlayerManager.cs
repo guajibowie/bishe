@@ -32,6 +32,8 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float _speedScale;
     [SerializeField] private float _playerHPlimit;
 
+    public Vector3 _playerPosition => _PlayerMovement.transform.position;
+
     private bool _isAlive;
     //管理的脚本
     public PlayerMovement _PlayerMovement;
@@ -65,6 +67,7 @@ public class PlayerManager : MonoBehaviour
         _jumpFactor = 1f;
         _playerHPlimit = 100f;
         _isAlive = true;
+
     }
 
     private void Start()
