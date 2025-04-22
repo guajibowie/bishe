@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]    private float _jumpFroce = 6f;
     [SerializeField]    private float _targetSpeed = 6f;
     [SerializeField]    private float _currentSpeed = 0f;
+    private Vector3 _airDirection;
 
     /// <summary>
     /// 与肉鸽玩法相关的参数，希望由PlayerManager管理
@@ -44,6 +45,7 @@ public class PlayerMovement : MonoBehaviour
 
     public bool _isRunning;
     public bool _isGrounded;
+    private float _airTimer;
     public bool _isJumping;
     public bool _moving;
     public bool _isAlive;
@@ -119,7 +121,19 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         //移动
-        _isGrounded = CharacterController.isGrounded;
+        if (!CharacterController.isGrounded)
+        {
+            _airTimer += Time.deltaTime;
+            if(_airTimer > 0.2f)
+            {
+                _isGrounded = CharacterController.isGrounded;
+                _airTimer = 0;
+            }
+        }
+        else
+        {
+            _isGrounded = true;
+        }
         CountMoveDirection();
         ApplyGravity();
         Move();
@@ -177,12 +191,14 @@ public class PlayerMovement : MonoBehaviour
         if (_isGrounded)
         {
             _currentSpeed = Mathf.Lerp(_currentSpeed, _targetSpeed, _VIF);
+            _horizontolDirection = transform.forward * _moveInput.y + transform.right * _moveInput.x;
+            _airDirection = _horizontolDirection;
         }
-        if(_moveInput.sqrMagnitude < _inputThreshold * _inputThreshold )
+        else
         {
-            _currentSpeed = 0;
+
+            _horizontolDirection = _airDirection;
         }
-        _horizontolDirection = transform.forward * _moveInput.y + transform.right * _moveInput.x;
         //若不在地上则会受到_deceleration的影响，一般会减速
         _horizontolDirection *= _currentSpeed * _speedFactor * (_isGrounded ? 1f : _deceleration);
         

@@ -13,6 +13,15 @@ public enum FireMode
     SEMI,
 
 }
+
+public enum DropType
+{
+    Health,
+    HealthLimit,
+    Damage,
+    Speed,
+    JumpFroce,
+}
 public class Enumerations
 {
 

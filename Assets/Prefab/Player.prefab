@@ -29539,7 +29539,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _VIF: 0.2
-  _deceleration: 0.9
+  _deceleration: 0.8
   _runSpeed: 10
   _walkSpeed: 6
   _jumpFroce: 6
@@ -29549,6 +29549,7 @@ MonoBehaviour:
   _isGrounded: 0
   _isJumping: 0
   _moving: 0
+  _isAlive: 0
   CharacterController: {fileID: 3991734972448596823}
   InputAction:
     m_Name: Input
@@ -29702,6 +29703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _WeaponDepot: {fileID: 6366095146538231381}
+  _PlayerMovement: {fileID: 7824114218055386995}
 --- !u!1 &5530020925577132502
 GameObject:
   m_ObjectHideFlags: 0

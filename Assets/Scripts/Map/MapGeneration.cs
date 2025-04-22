@@ -139,7 +139,7 @@ public class MapGeneration : MonoBehaviour
         return _count;
     }
 
-    public void setNeighborWalls(int[,] map, int x, int y)
+    public void SetNeighborWalls(int[,] map, int x, int y)
     {
         if (map[x, y] != 1) return;
         foreach (var dir in _directions)
@@ -258,7 +258,7 @@ public class MapGeneration : MonoBehaviour
         {
             for(int j = 0; j < _matrixCols; j++)
             {
-                setNeighborWalls(map, i, j);
+                SetNeighborWalls(map, i, j);
                 yield return null;
             }
         }
@@ -288,7 +288,7 @@ public class MapGeneration : MonoBehaviour
                     continue;
                 }
                 decoration.transform.position = hit.point;
-                decoration.transform.rotation = Quaternion.Euler(new Vector3(decoration.transform.rotation.x, decoration.transform.rotation.y+ UnityEngine.Random.Range(0,90), decoration.transform.rotation.x));
+                decoration.transform.rotation = Quaternion.Euler(new Vector3(decoration.transform.rotation.x, decoration.transform.rotation.y+ UnityEngine.Random.Range(0,180), decoration.transform.rotation.x));
                 decoration.transform.localScale = new Vector3(
                     decoration.transform.localScale.x / decoration.transform.parent.localScale.x,
                     decoration.transform.localScale.y / decoration.transform.parent.localScale.y,

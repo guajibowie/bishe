@@ -584,6 +584,7 @@ MonoBehaviour:
   _jumpFactor: 1
   _speedScale: 0
   _playerHPlimit: 0
+  _damage: 0
   _PlayerMovement: {fileID: 0}
   _playerMovementState: 0
 --- !u!4 &1182875264

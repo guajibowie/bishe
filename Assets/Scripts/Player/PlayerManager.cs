@@ -31,6 +31,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float _jumpFactor;
     [SerializeField] private float _speedScale;
     [SerializeField] private float _playerHPlimit;
+    [SerializeField] private float _damage;
 
     public Vector3 _playerPosition => _PlayerMovement.transform.position;
 
@@ -52,6 +53,9 @@ public class PlayerManager : MonoBehaviour
     public delegate void OnPlayerHPlimitChange(float newLimit);
     public event OnPlayerHPlimitChange _HPlimitChange;
 
+    public delegate void OnDamageChange(float newDamage);
+    public event OnDamageChange _damageChange;
+
     private void Awake()
     {
         if (_instance == null)
@@ -66,6 +70,7 @@ public class PlayerManager : MonoBehaviour
         _speedScale = 1f;
         _jumpFactor = 1f;
         _playerHPlimit = 100f;
+        _damage = 0f;
         _isAlive = true;
 
     }
@@ -132,8 +137,20 @@ public class PlayerManager : MonoBehaviour
         _jumpFactor += deltaJumpFactor;
         _jumpFactorChange?.Invoke(_jumpFactor);
     }
-
-
+    /// <summary>
+    /// …À∫¶œ‡πÿ
+    /// </summary>
+    /// <returns></returns>
+    public void ChangeDamage(float newDamage)
+    {
+        _damage = newDamage;
+        _damageChange?.Invoke(_damage);
+    }
+    public void AddDamage(float newDamage)
+    {
+        _damage += newDamage;
+        _damageChange?.Invoke(_damage);
+    }
 
     public float GetSpeedFactor()
     {
@@ -175,6 +192,11 @@ public class PlayerManager : MonoBehaviour
     public void PlayerDeaded()
     {
         _isAlive = false;
+    }
+
+    public bool CheckAlive()
+    {
+        return _isAlive;
     }
     public void SetPlayerMovement(PlayerMovement playerMovement)
     {
