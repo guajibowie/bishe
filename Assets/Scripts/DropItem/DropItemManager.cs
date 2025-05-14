@@ -24,18 +24,6 @@ public class DropItemManager : MonoBehaviour
                 DropItem = _dropItem[1];
                 break;
             }
-            case DropType.Speed:
-            {
-                DropItem = _dropItem[2];
-                break;
-            }
-            default:
-                DropItem = _dropItem[0];
-                break;
-        }
-
-        Instantiate<GameObject>(DropItem, position: position,rotation:Quaternion.identity);
-    }
 
     public void CreateDropItem(DropType type, Vector3 position)
     {
