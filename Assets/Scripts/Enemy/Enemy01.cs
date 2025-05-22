@@ -39,7 +39,13 @@ public class Enemy01 : MonoBehaviour
     public int _attack_anim;
     public int _hitReaction_anim;
     public int _isMoving_anim;
+    public int _isDeaded_anim;
 
+
+    private void OnEnable()
+    {
+        _curHP = _HPlimit;
+    }
     void Start()
     {
 
@@ -50,10 +56,11 @@ public class Enemy01 : MonoBehaviour
         _attack_anim = Animator.StringToHash("Armature|Attack");
         _hitReaction_anim = Animator.StringToHash("Armature|Hit_reaction");
         _isMoving_anim = Animator.StringToHash("IsMoving");
+        _isDeaded_anim = Animator.StringToHash("IsDeaded");
 
-    _FsmSystem = new FsmSystem<Enemy01>(this);
+        _FsmSystem = new FsmSystem<Enemy01>(this);
         _NavMeshAgent = GetComponent<NavMeshAgent>();
-        _NavMeshAgent.updateRotation = false;
+        _NavMeshAgent.updatePosition = false;
         if(NavMesh.SamplePosition(transform.position,out NavMeshHit hit, 10f, NavMesh.AllAreas))
         {
             transform.position = hit.position;
@@ -91,7 +98,13 @@ public class Enemy01 : MonoBehaviour
         _FsmSystem.Update();
     }
 
-
+    private void OnAnimatorMove()
+    {
+        Vector3 _position = _Animator.rootPosition;
+        _NavMeshAgent.nextPosition = new Vector3(_position.x, _NavMeshAgent.nextPosition.y, _position.z);
+        _position.y = _NavMeshAgent.nextPosition.y;
+        transform.position = _position;
+    }
     /// <summary>
     /// ¼ì²â½ÇÉ«ÊÇ·ñ½øÈë×·»÷·¶Î§
     /// </summary>
@@ -104,7 +117,7 @@ public class Enemy01 : MonoBehaviour
     }
     public void CheckStuck()
     {
-        if (_isCatching) return;
+        if (_isCatching || _FsmSystem._currentStateID == "idle") return;
         float moveDistance = Vector3.Distance(_lastPosition, transform.position);
         if(moveDistance < _stuckThresholdDistance)
         {
@@ -117,8 +130,8 @@ public class Enemy01 : MonoBehaviour
 
         if (_stuckTimer > _stuckThresholdTime)
         {
-            Debug.Log("stuck!");
             _NavMeshAgent.SetDestination(GetNavMeshPoint());
+            _Animator.SetBool(_isMoving_anim, true);
             _stuckTimer = 0;
         }
 
@@ -156,34 +169,73 @@ public class Enemy01 : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _rotationSpeed);
     }
 
-    public void OnCollisionStay(Collision collision)
+    private void OnTriggerStay(Collider other)
     {
-        if(collision.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
             _isCatching = true;
             if (_lastAttackTime + _attackCooldown <= Time.time)
             {
-                _Animator.CrossFade(_attack_anim,0.1f);
-                StartCoroutine(Attack(collision.transform, 1f));
+                _Animator.CrossFade(_attack_anim, 0.1f);
+                StartCoroutine(Attack(other.transform, 1f));
                 //collision.transform.GetComponent<PlayerCollisionControl>().OnHurt(_attack);
                 _lastAttackTime = Time.time;
             }
         }
     }
 
-    private void OnCollisionExit(Collision collision)
+    private void OnTriggerExit(Collider other)
     {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            _isCatching = false;
-        }
+            if (other.gameObject.CompareTag("Player"))
+            {
+                _isCatching = false;
+            }
     }
+    
+    
+    public void OnHurt(float Damage)
+    {
+        _curHP -= Damage;
+        _Animator.Play(_hitReaction_anim);
+        _curHP = Mathf.Clamp(_curHP, 0, _HPlimit);
+        if(_curHP <= 0)
+        {
+            _Animator.SetBool(_isDeaded_anim, true);
+            EnemyManager.Instance.ReturnToPool(gameObject);
+            DropItemManager.Instance.CreateDropItem(transform.position);
+        }
+        Debug.Log("enemy hurt" + Damage + "\\" + _curHP);
+    }
+
+    //public void OnCollisionStay(Collision collision)
+    //{
+    //    if(collision.gameObject.CompareTag("Player"))
+    //    {
+    //        _isCatching = true;
+    //        if (_lastAttackTime + _attackCooldown <= Time.time)
+    //        {
+    //            _Animator.CrossFade(_attack_anim,0.1f);
+    //            StartCoroutine(Attack(collision.transform, 1f));
+    //            //collision.transform.GetComponent<PlayerCollisionControl>().OnHurt(_attack);
+    //            _lastAttackTime = Time.time;
+    //        }
+    //    }
+    //}
+
+    //private void OnCollisionExit(Collision collision)
+    //{
+    //    if (collision.gameObject.CompareTag("Player"))
+    //    {
+    //        _isCatching = false;
+    //    }
+    //}
 
     IEnumerator Attack(Transform target,float delay)
     {
         yield return new WaitForSeconds(delay);
         if (_isCatching)
         {
+            Debug.Log("atk" + transform.name);
             target.GetComponent<PlayerCollisionControl>().OnHurt(_attack);
         }
     }
@@ -199,12 +251,12 @@ class IdleState : State<Enemy01>
     {
         _param._Animator.SetBool(_param._isMoving_anim, false);
         _lastTime = Time.time;
-        Debug.Log("Enter Idle");
+
     }
 
     public override void OnExit()
     {
-        Debug.Log("Exit Idle");
+
     }
 
     public override void OnUpdate()
@@ -239,7 +291,7 @@ class WalkState : State<Enemy01>
 
     public override void OnUpdate()
     {
-        if (_param._NavMeshAgent.remainingDistance < _minDistance)
+        if (_param._NavMeshAgent.remainingDistance <= _param._NavMeshAgent.stoppingDistance)
         {
             fsm.ChangeState("idle");
         }
@@ -251,7 +303,6 @@ class ChaseState : State<Enemy01>
     Vector3 _targetPosition;
     public override void OnEnter()
     {
-        Debug.Log("chase");
         _targetPosition = _param.GetNavMeshPoint(PlayerManager.Instance._playerPosition);
         _param._NavMeshAgent.SetDestination(_targetPosition);
         _param._Animator.SetBool(_param._isMoving_anim, true);

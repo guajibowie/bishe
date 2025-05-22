@@ -8,11 +8,11 @@ using UnityEngine.InputSystem.Utilities;
 
 
 public class PlayerMovement : MonoBehaviour
-{   
+{
     /// <summary>
     /// 角色控制脚本
     /// </summary>
-    
+    public GameObject _weapon;
     
     public float _VIF = 0.2f; //速度插值系数 ： velocity interpolation factor
     public float _deceleration = 0.9f; // 减速系数
@@ -120,6 +120,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (Keyboard.current.zKey.wasPressedThisFrame)
+        {
+            //GameManager.Instance.GameOver_Panel(PlayerManager.Instance.CheckAlive());
+            Hurt(34);
+        }
         //移动
         if (!CharacterController.isGrounded)
         {
@@ -257,12 +262,22 @@ public class PlayerMovement : MonoBehaviour
 
     public void Hurt(float damage)
     {
+        if (!PlayerManager.Instance.CheckAlive()) return;
         _curHP -= damage;
         if(_curHP <= 0)
         {
             _isAlive = false;
+            _weapon.SetActive(false);
+            PlayerManager.Instance.PlayerDeaded();
+            Invoke("SetEndPanel",4);
             Debug.Log("dead");
+            this.enabled = false;
         }
+    }
+
+    private void SetEndPanel()
+    {
+            GameManager.Instance.GameOver_Panel(PlayerManager.Instance.CheckAlive());
     }
 
     public void Restore(float amount)
@@ -294,6 +309,7 @@ public class PlayerMovement : MonoBehaviour
         _inputThreshold = newInputThreshold;
     }
 
+  
 
     //供给PlayerManager
     public PlayerMovementState GetPlayerMovementState()

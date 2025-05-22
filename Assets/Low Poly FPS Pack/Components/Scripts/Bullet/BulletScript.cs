@@ -125,7 +125,13 @@ public class BulletScript : MonoBehaviour {
 			//Destroy bullet object
 			Destroy(gameObject);
 		}
-	}
+
+		if(collision.gameObject.CompareTag("Enemy01") || collision.gameObject.CompareTag("Enemy02"))
+		{
+			Destroy(gameObject);
+		}
+
+    }
 
 	private IEnumerator DestroyTimer () 
 	{

@@ -21,6 +21,7 @@ public class Weapon_Shotgun : Weapon
     public ushort _ammunition;
     public ushort _initialAmmunition;
     public ushort _projectileNumber;
+    public float _damage;
 
     private bool _isAiming;
     private bool _isFiring;
@@ -321,7 +322,10 @@ public class Weapon_Shotgun : Weapon
             }
             if (Physics.Raycast(_shootPoint.position, _shootDirection,out _hit, _shootRange))
             {
-                Debug.Log("Fire");
+                if (_hit.transform.CompareTag("Enemy01") || _hit.transform.CompareTag("Enemy02"))
+                {
+                    _hit.transform.GetComponent<Enemy01>().OnHurt(_damage);
+                }
             }
             GameObject _bulletClone;
             _bulletClone = Instantiate(_bulletPrefab,_hit.point, _shootPoint.transform.rotation);

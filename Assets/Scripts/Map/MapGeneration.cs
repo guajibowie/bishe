@@ -14,6 +14,8 @@ using UnityEngine.AI;
 
 public class MapGeneration : MonoBehaviour
 {
+
+    public bool Done = false; 
     public GameObject _wallPrefab;
     public GameObject[] _floorPrefabs;
     public Transform _environment;
@@ -42,7 +44,11 @@ public class MapGeneration : MonoBehaviour
     public Vector2 _spawnPoint;
 
     public NavMeshSurface _NavMeshSurface;
-    public List<Vector3> _monsterSpawnPoint;
+    public List<Vector3> _enemySpawnPoint;
+
+    public delegate void MapGenerated(bool Done);
+    public event MapGenerated OnMapGenerated;
+
 
     // Start is called before the first frame update
     void Awake()
@@ -59,6 +65,11 @@ public class MapGeneration : MonoBehaviour
         PlayerManager.Instance.SetPlayerMovement(player.GetComponent<PlayerMovement>());
 
         
+    }
+
+    private void Start()
+    {
+        OnMapGenerated += GameManager.Instance.MapDone;
     }
     public void SeedInit()
     {
@@ -212,6 +223,7 @@ public class MapGeneration : MonoBehaviour
                 if(map[(int)curWalker._position.x, (int)curWalker._position.y] != 1)
                 {
                     GameObject floor = SetFloor(curWalker._position,true);
+                    _enemySpawnPoint.Add(new Vector3(curWalker._position.x * _floorRadius * 2 + _floorRadius, 0, curWalker._position.y * _floorRadius * 2 + _floorRadius));
                     if (!_floorCloneName.Contains(floor.name))
                     {
                         _floorCloneName.Add(floor.name);
@@ -264,6 +276,9 @@ public class MapGeneration : MonoBehaviour
         }
 
         CreateNavMesh();
+        InitSpwanPoint();
+        Done = true;
+        OnMapGenerated?.Invoke(Done);
     }
 
     IEnumerator CreateDecorations(GameObject parent)
@@ -316,5 +331,23 @@ public class MapGeneration : MonoBehaviour
     {
         _NavMeshSurface.RemoveData();
         _NavMeshSurface.BuildNavMesh();
+    }
+
+
+    public void InitSpwanPoint()
+    {
+       for ( int i = 0; i < _enemySpawnPoint.Count; i++)
+        {
+            Vector3 position = _enemySpawnPoint[i];
+            if(NavMesh.SamplePosition(position, out NavMeshHit hit, 10f, NavMesh.AllAreas))
+            {
+
+                _enemySpawnPoint[i] = hit.position;
+            }
+        }
+    }
+    public List<Vector3> GetEnemySpawnPointList()
+    {
+        return _enemySpawnPoint;
     }
 }

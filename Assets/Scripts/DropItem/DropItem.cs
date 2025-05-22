@@ -24,12 +24,13 @@ public class DropItem : MonoBehaviour
         _Model.eulerAngles += new Vector3(0, _rotationalSpeed * Time.deltaTime, 0);
         _Model.localPosition = new Vector3(_Model.localPosition.x, _initLocalPosition.y + _floatAmplitude * Mathf.Sin(Time.time * _floatFrequency), _Model.localPosition.z);
     }
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
-            collision.transform.GetComponent<PlayerCollisionControl>().PickDropItem(_dropType, _value);
+            other.transform.GetComponent<PlayerCollisionControl>().PickDropItem(_dropType, _value);
             Destroy(gameObject);
         }
     }
+
 }

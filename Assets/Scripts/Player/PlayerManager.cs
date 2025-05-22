@@ -33,9 +33,12 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float _playerHPlimit;
     [SerializeField] private float _damage;
 
+    //public Vector3 _playerPosition;
     public Vector3 _playerPosition => _PlayerMovement.transform.position;
 
     private bool _isAlive;
+
+    public GameObject DeadedPrefab;
     //管理的脚本
     public PlayerMovement _PlayerMovement;
 
@@ -77,9 +80,12 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
-        _playerMovementState = _PlayerMovement.GetPlayerMovementState();
+        if (_PlayerMovement)
+        {
+            _playerMovementState = _PlayerMovement.GetPlayerMovementState();
 
-        _PlayerMovement._playerMovementChange += SyncPlayerMovementState;
+            _PlayerMovement._playerMovementChange += SyncPlayerMovementState;
+        }
     }
 
     //
@@ -189,10 +195,6 @@ public class PlayerManager : MonoBehaviour
         Debug.Log("Hello,I am PlayerManager");
     }
 
-    public void PlayerDeaded()
-    {
-        _isAlive = false;
-    }
 
     public bool CheckAlive()
     {
@@ -202,4 +204,18 @@ public class PlayerManager : MonoBehaviour
     {
         _PlayerMovement = playerMovement;
     }
+
+
+    public float GetDamage()
+    {
+        return _damage;
+    }
+    public void PlayerDeaded()
+    {
+        _isAlive = false;
+        Animator _cameraMain_Anim =  Camera.main.transform.GetComponent<Animator>();
+        Instantiate<GameObject>(DeadedPrefab,position:Camera.main.transform.parent.position,rotation:Quaternion.identity);
+        _cameraMain_Anim.enabled = true;
+    }
+
 }

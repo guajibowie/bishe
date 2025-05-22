@@ -21,6 +21,7 @@ public class Weapon_Automatic : Weapon
     public ushort _currentMagBullet;
     public ushort _ammunition;
     public ushort _initialAmmunition;
+    public float _damage;
 
     private bool _isAiming;
     private bool _isFiring;
@@ -312,7 +313,10 @@ public class Weapon_Automatic : Weapon
         }
         if (Physics.Raycast(_shootPoint.position, _shootDirection,out _hit, _shootRange))
         {
-            Debug.Log("Fire");
+            if (_hit.transform.CompareTag("Enemy01") || _hit.transform.CompareTag("Enemy02"))
+            {
+                _hit.transform.GetComponent<Enemy01>().OnHurt(_damage);
+            }
             Debug.DrawLine(_shootPoint.position, _hit.point,Color.red,5f);
         }
         GameObject _bulletClone;
